@@ -1,0 +1,23 @@
+[Unit]
+Description=name-service Microservice
+Requires=network.target
+After=network.target
+After=syslog.target
+
+[Service]
+TimeoutStartSec=0
+RestartSec=7
+Restart=always
+User=administrador
+KillSignal=SIGTERM
+Type=notify
+NotifyAccess=all
+StandardError=syslog
+
+
+WorkingDirectory=/home/administrador/microservices/name-service
+Environment="PATH=/home/administrador/microservices/name-service/venv/bin"
+ExecStart=/home/administrador/microservices/name-service/venv/bin/uwsgi --ini process-config.ini
+
+[Install]
+WantedBy=multi-user.target

@@ -66,6 +66,10 @@ ERRORS = {
         'code': 404,
         'message': 'User not found',
     },
+    'CUSTOMER_NOT_FOUND': {
+        'code': 404,
+        'message': 'Customer not found',
+    },
     'COMPANY_NOT_FOUND': {
         'code': 404,
         'message': 'Company not found',

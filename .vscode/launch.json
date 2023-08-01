@@ -11,12 +11,12 @@
             "module": "flask",
             "env": {
                 "FLASK_APP": "wsgi.py",
-                "FLASK_DEBUG": "1",
-                "PUBLIC_PORT": "4000"
+                "FLASK_DEBUG": "1"
             },
             "args": [
                 "run",
-                "--no-debugger"
+                "--no-debugger",
+                "--port", "4001"
             ],
             "jinja": true,
             "justMyCode": true

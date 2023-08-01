@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RIA Money Transfer SSO</title>
+    <script src="https://staging-secure.riamoneytransfer.com/sdk/rmtsso_sdk.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        #ip {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+    <div id="rmt_container"></div>
+    <div id="ip">Loading IP...</div>
+    <script type="text/javascript">
+        // These values should be assigned properly
+        var ssoToken = '';  // the SSO token stored for the current user
+        var elementId = 'rmt_container';
+        var userData = { // user data from your system
+            email: 'test@test.de',
+            firstName: 'First',
+            lastName: 'Last',
+            phoneNumberCountry: '1',
+            phoneNumber: '5152901234',
+            street: 'Street',
+            city: 'City',
+            postalCode: '12345',
+            state: 'AL',
+        };
+        var tokenCallback = function(token) { // handle the SSO token
+            // process the token in your backend
+        };
+        var checkLoggedInCallback = function() { // check if user is logged in
+            // return true if user is logged in to your system
+        };
+
+        // Setup RIA Money Transfer SSO
+        var ssoObject = setupRmtSso(ssoToken, elementId, userData, tokenCallback, checkLoggedInCallback);
+
+        // Call this function to log out the user
+        function logout() {
+            ssoObject.logout();
+        }
+    </script>
+    <script type="text/javascript">
+        $.getJSON('https://api.ipify.org?format=json', function(data) {
+            $('#ip').html('IP: ' + data.ip);
+        });
+    </script>    
+</body>
+</html>

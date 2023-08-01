@@ -14,7 +14,7 @@ class BackendPlatformAdapter:
         self.host_backend = current_app.config['host_backend_platform']
 
     def get_user_minimal(self, user_id: int, sms_code: str):
-        url = f'{self.host_backend}/api/internal/minimal/{user_id}'
+        url = f'{self.host_backend}/api/internal/minimal-rm/{user_id}'
 
         try:
             if sms_code:
@@ -33,7 +33,7 @@ class BackendPlatformAdapter:
                 return response.json()
             print(str(e))
             logger.error(f'HTTP error occurred: {str(e)}')
-            raise ProjectException(tag="http_error", message=str(e))
+            raise ProjectException(tag="http_error", message=response.json())
         except Exception as e:
             logger.error(f'An error occurred: {str(e)}')
             raise ProjectException(tag="unknown_error", message=str(e))

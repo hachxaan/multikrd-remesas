@@ -17,4 +17,4 @@ class UserService:
             return user
         except Exception as e:
             logger.error(f'An error occurred: {str(e)}')
-            raise
+            raise Exception

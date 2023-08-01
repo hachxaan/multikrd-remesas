@@ -1,6 +1,6 @@
 from functools import wraps
 from typing import Callable, Dict
-from flask import request
+from flask import abort, current_app, request
 
 
 from src.config.constants import SMS_CODE_HEADER_NAME
@@ -13,43 +13,6 @@ from src.shared.tools.logger import internal_logger
 
 logger = internal_logger.get_logger()
 
-
-def access_level(
-    admin_company: bool = False,
-    admin_peo: bool = False,
-    admin_api: bool = False,
-    admin_multikrd: bool = True,
-    admin_multikrd_2: bool = False,
-) -> Callable:
-    """
-    Access level wrapper to use un blueprints to manage the access level of a user in an endpoint.
-    :param admin_company:
-    :param admin_peo:
-    :param admin_api:
-    :param admin_multikrd:
-    :param admin_multikrd_2:
-    :return:
-    """
-
-    def check_access_level(func: Callable) -> Callable:
-        @wraps(func)
-        @login_required()
-        def wrapper(user: Dict, *args, **kwargs) -> Callable:
-            if not can_access(
-                admin_company=admin_company,
-                admin_peo=admin_peo,
-                admin_api=admin_api,
-                admin_multikrd=admin_multikrd,
-                admin_multikrd_2=admin_multikrd_2,
-                user=user,
-            ):
-                raise ProjectException("FORBIDDEN")
-
-            return func(user, *args, **kwargs)
-
-        return wrapper
-
-    return check_access_level
 
 
 def login_required(
@@ -173,40 +136,6 @@ def api_key(
     return api_key
 
 
-def can_access(
-    admin_company: bool,
-    admin_peo: bool,
-    admin_api: bool,
-    admin_multikrd: bool,
-    admin_multikrd_2: bool,
-    user: Dict,
-) -> bool:
-    """
-    Returns if a user can access or not depending of his access lvl
-    permissions.
-    :param admin_company:
-    :param admin_peo:
-    :param admin_api:
-    :param admin_multikrd:
-    :param admin_multikrd_2:
-    :param usr:
-    :return bool:
-    """
-
-    return (
-        admin_company
-        and user.admin_company
-        or admin_multikrd
-        and user.admin_multikrd
-        or admin_peo
-        and user.admin_peo
-        or admin_api
-        and user.admin_api
-        or admin_multikrd_2
-        and user.admin_multikrd_2
-    )
-
-
 def is_user_logged(token) -> bool:
     """
     Check if user is logged
@@ -223,3 +152,24 @@ def decode_from_token(token: str) -> Dict:
     :return Dict:
     """
     return WhiteList.decode(token=token)[0]
+
+
+def ip_whitelist(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        real_ip = request.headers.get('X-Real-IP')
+        ip_whitelist = current_app.config.get('white_list_ip', '').split(',')
+        if real_ip not in ip_whitelist:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+def api_key_ria(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        api_key = request.headers.get('x-api-key')
+        ria_api_key = current_app.config.get('x_api_key_ria')
+        if api_key != ria_api_key:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function

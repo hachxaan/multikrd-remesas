@@ -1,3 +1,5 @@
+# src\shared\tools\utils.py
+
 import hashlib
 
 from sqlalchemy import inspect

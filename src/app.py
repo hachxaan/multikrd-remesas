@@ -4,18 +4,15 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from redis import Redis
 from flask_migrate import Migrate
+from src.remittances.infraestructure.microservices.solid.singleton import SolidOperationSingleton
 
 from src.shared.ddd.domain.model.DomainEventPublisher import DomainEventPublisher
 from src.shared.tools.errors.error_handler import constructor_error_handler
 
-from src.name_service.application.subscribers.sample_subscriber import SampleSubscriber
-from src.name_service.infraestructure.persistence.adapters.sample_persistence_adapter import SampleRepositoryAdapter
-from src.name_service.infraestructure.persistence.database.services.sample_orm_service import SampleORMService
-from src.name_service.infraestructure.persistence.database.instance import database_instance as db
-from src.name_service.infraestructure.web.entrypoints import (
-    sample_blueprint
+from src.remittances.infraestructure.persistence.database.instance import database_instance as db
+from src.remittances.infraestructure.web.entrypoints import (
+    ria_blueprint, frontend_blueprint
 )
-from src.config.constants import PASS_SALT_NAME, SALT_KEY_NAME
 from src.shared.cache.redis import RedisSingleton
 from src.shared.tools.errors.method_not_allowed import send_method_not_found
 from src.shared.tools.errors.not_found_handler import send_not_found
@@ -23,26 +20,23 @@ from src.shared.tools.errors.not_found_handler import send_not_found
 
 template_folder = 'context/infraestructure/endpoints/templates'
 bps = (
-    sample_blueprint.bp_sample,
+    ria_blueprint.bp_ria,
+    frontend_blueprint.bp_frontend
 )
 
 
 
 def create_app(**kwargs):
-
+    
     # templates
     app = Flask(
         __name__, template_folder=template_folder)
 
 
     # Load configurations from CONFIG
-    app.config.from_mapping(**kwargs)
+    app.config.update(**kwargs)
 
     db.init_app(app)
-
-    app.config[SALT_KEY_NAME] = kwargs[PASS_SALT_NAME], kwargs['SECRET_KEY']
-
-
 
     app.redis = RedisSingleton(
         dns=kwargs["REDIS_DNS"], port=kwargs["REDIS_PORT"], database=kwargs["REDIS_DATABASE"]
@@ -54,11 +48,18 @@ def create_app(**kwargs):
     # Initialize Flask extensions
     app.config['bcrypt'] = Bcrypt(app)
 
+    app.config['X_API_KEY_RIA'] = kwargs['security']['X_API_KEY_RIA']
+    app.config['IP_WHITE_LIST_RIA'] = kwargs['security']['IP_WHITE_LIST_RIA']   
+
+    app.solid = SolidOperationSingleton(
+        base_url=kwargs['solid']['url'],
+        service_key=kwargs['solid']['x_api_key']
+    )
 
     ################################### Add subscribers ###################################
-    subcribers = (SampleSubscriber(SampleRepositoryAdapter(SampleORMService())),)
-    [DomainEventPublisher.of().subscribe(
-        subscribers=subscriber) for subscriber in subcribers]
+    # subcribers = (SampleSubscriber(SampleRepositoryAdapter(SampleORMService())),)
+    # [DomainEventPublisher.of().subscribe(
+    #     subscribers=subscriber) for subscriber in subcribers]
 
     CORS(app)
 

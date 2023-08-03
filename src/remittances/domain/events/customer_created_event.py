@@ -5,7 +5,7 @@ from src.shared.ddd.domain.model.DateA import DateA
 from src.shared.ddd.domain.model.IDomainEvent import IDomainEvent
 
 
-class TransferCreated(IDomainEvent):
+class CustomerCreatedEvent(IDomainEvent):
     """ ev- """
 
     __occurredOn: DateA

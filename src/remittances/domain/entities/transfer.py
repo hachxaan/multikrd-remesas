@@ -1,15 +1,31 @@
 # src\remittances\domain\entities\transfer.py
 
+from datetime import datetime
 from src.shared.ddd.domain.model.EntityRoot import EntityRoot
+from src.shared.ddd.domain.model.Id import Id
 
 class Transfer(EntityRoot):
+    
+    _id: int
+    _uuid: Id
+    _customer_uuid: Id
+    _amount: float
+    _solid_transaction_id: str
+    _ria_transaction_ref: str
+    _destination: str
+    _tx_response: str
+    _code_status: int
+    _created_at: datetime
+
+
+
     def __init__(self, **kwargs):
         self._id = kwargs.get('id', None)
         self._uuid = kwargs.get('uuid', None)
         self._customer_uuid = kwargs.get('customer_uuid', None)
-        self._user_id = kwargs.get('user_id', None)
         self._amount = kwargs.get('amount', None)
-        self._transaction_id = kwargs.get('transaction_id', None)
+        self._solid_transaction_id = kwargs.get('solid_transaction_id', None)
+        self._ria_transaction_ref = kwargs.get('ria_transaction_ref', None)
         self._destination = kwargs.get('destination', None)
         self._tx_response = kwargs.get('tx_response', None)
         self._code_status = kwargs.get('code_status', None)
@@ -20,33 +36,33 @@ class Transfer(EntityRoot):
         transfer = Transfer(**kwargs)
         return transfer
 
-    def save(self):
-        from src.remittances.domain.events.transfer_created import TransferCreated
-        EntityRoot.publishEvent(TransferCreated(self))
+    # def save(self):
+    #     from src.remittances.domain.events.transfer_created_event import TransferCreatedEvent
+    #     EntityRoot.publishEvent(TransferCreatedEvent(self))
 
     @property
-    def id(self):
+    def id(self) -> int:
         return self._id
 
     @property
-    def uuid(self):
+    def uuid(self) -> Id:
         return self._uuid
 
     @property
-    def customer_uuid(self):
+    def customer_uuid(self) -> Id:
         return self._customer_uuid
-
-    @property
-    def user_id(self):
-        return self._user_id
 
     @property
     def amount(self):
         return self._amount
 
     @property
-    def transaction_id(self):
-        return self._transaction_id
+    def solid_transaction_id(self):
+        return self._solid_transaction_id
+    
+    @property
+    def ria_transaction_ref(self):
+        return self._ria_transaction_ref
 
     @property
     def destination(self):

@@ -48,5 +48,4 @@ CONFIG = {
     'MAIL_PASSWORD': os.getenv('MAIL_PASSWORD'),
     'api_key_backend_platform_out': os.getenv('API_KEY_BACKEND_PLATFORM_OUT', 'BAf3F1dF98b20be4f4fcaB59BcBc8e54D1f9Beb1cD109FcF2a02E13b1Ce9dAF3'),
     'host_backend_platform': os.getenv('HOST_BACKEND_PLATFORM', 'http://10.209.97.4'),
-    'white_list_ip': os.getenv('WHITE_LIST_IP', '127.0.0.1,10.209.97.4'),
 }

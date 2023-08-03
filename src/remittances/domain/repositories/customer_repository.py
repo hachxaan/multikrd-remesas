@@ -28,3 +28,7 @@ class ICustomerRepository(ABC):
     @abstractmethod
     def save_customer_entity(self, customer_entity: Customer) -> None:
         pass
+
+    @abstractmethod
+    def save_token(self, customer_entity: Customer) -> None:
+        pass    

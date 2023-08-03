@@ -12,8 +12,12 @@ class CustomerModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(as_uuid=True), unique=True, nullable=True)
-    user_id = db.Column(db.Integer,  unique=False, nullable=False)
-    ria_token = db.Column(db.String,  unique=False, nullable=False)
+    user_id = db.Column(db.Integer,  unique=True, nullable=False)
+    email = db.Column(db.String,  unique=True, nullable=False)
+    mobile_phone = db.Column(db.String,  unique=False, nullable=True)
+    ria_token = db.Column(db.String,  unique=False, nullable=True)
+    first_name = db.Column(db.String,  unique=False, nullable=False)
+    last_name = db.Column(db.String,  unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     

@@ -4,7 +4,16 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from redis import Redis
 from flask_migrate import Migrate
+from src.remittances.application.subscribers.customer_created_subscriber import CustomerCreatedSubscriber
+from src.remittances.application.subscribers.token_saved_subscriber import TokenSavedSubscriber
+from src.remittances.application.subscribers.transfer_created_subscriber import TransferCreatedSubscriber
+from src.remittances.application.subscribers.transfer_sent_subscriber import TransferSentSubscriber
 from src.remittances.infraestructure.microservices.solid.singleton import SolidOperationSingleton
+from src.remittances.infraestructure.persistence.adapters.customer_persistence_adapter import CustomerRepositoryAdapter
+from src.remittances.infraestructure.persistence.adapters.transfer_persistence_adapter import TransferRepositoryAdapter
+from src.remittances.infraestructure.persistence.database.services.customer_orm_service import CustomerORMService
+from src.remittances.infraestructure.persistence.database.services.transfer_orm_service import TransferORMService
+from src.remittances.infraestructure.rest.adapters.transfer_service_adapter import TransferServiceAdapter
 
 from src.shared.ddd.domain.model.DomainEventPublisher import DomainEventPublisher
 from src.shared.tools.errors.error_handler import constructor_error_handler
@@ -57,9 +66,18 @@ def create_app(**kwargs):
     )
 
     ################################### Add subscribers ###################################
-    # subcribers = (SampleSubscriber(SampleRepositoryAdapter(SampleORMService())),)
-    # [DomainEventPublisher.of().subscribe(
-    #     subscribers=subscriber) for subscriber in subcribers]
+    subcribers = (
+        CustomerCreatedSubscriber(CustomerRepositoryAdapter(CustomerORMService())),
+        TokenSavedSubscriber(CustomerRepositoryAdapter(CustomerORMService())),
+        TransferCreatedSubscriber(TransferRepositoryAdapter(TransferORMService())),
+        TransferSentSubscriber(
+            TransferServiceAdapter(),
+            TransferRepositoryAdapter(TransferORMService())
+            ),
+    )
+
+    [DomainEventPublisher.of().subscribe(
+        subscribers=subscriber) for subscriber in subcribers]
 
     CORS(app)
 

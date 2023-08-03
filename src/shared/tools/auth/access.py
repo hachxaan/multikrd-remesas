@@ -157,8 +157,8 @@ def decode_from_token(token: str) -> Dict:
 def ip_whitelist(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        real_ip = request.headers.get('X-Real-IP')
-        ip_whitelist = current_app.config.get('white_list_ip', '').split(',')
+        real_ip = request.headers.get('X-Real-IP', request.remote_addr)
+        ip_whitelist = current_app.config.get('IP_WHITE_LIST_RIA', '').split(',')
         if real_ip not in ip_whitelist:
             abort(403)
         return f(*args, **kwargs)
@@ -168,7 +168,7 @@ def api_key_ria(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         api_key = request.headers.get('x-api-key')
-        ria_api_key = current_app.config.get('x_api_key_ria')
+        ria_api_key = current_app.config.get('X_API_KEY_RIA')
         if api_key != ria_api_key:
             abort(403)
         return f(*args, **kwargs)
